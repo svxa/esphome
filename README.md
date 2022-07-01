@@ -1,0 +1,2 @@
+# esphome
+ESPHome configuration files
