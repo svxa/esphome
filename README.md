@@ -23,6 +23,8 @@ RJ45 Ethernet Splitter Adapter: 1 Male to 2 Female: https://www.amazon.com/Ether
 
 Male plugged into motor control box, 1 female goes to the control panel, 1 female goes to the ESP
 
+The ESP is connected to the desk through a logic level shifter, which shifts from 3.3V (ESP) to 5V (Desk).
+
 For the multiplication factors below, I
 1. Set the delay to a fixed value, e.g. 2 seconds
 2. Drive the desk into the lowest position
