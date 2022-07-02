@@ -30,7 +30,7 @@ It's not really "necessary" but it's a nice touch if you for example want to get
 ## Prerequisites
 1. Fully Jarvis Standing Desk. I bought mine in 2020, but it still seems to be exactly the same in 2022. [Link](https://www.fully.com/standing-desks/jarvis-frame-only.html)
     - I have the programmable memory handset, but I think it should also work with the non-programmable one. With a bit of extra work, you could make a script that drives up to a certain height.
-        <img src="https://static.fully.com/image/upload/c_limit,dpr_2.0,f_auto,h_700,q_auto,w_700/v1/media/catalog/product/f/u/fully-jarvis-standing-desk-memory-handset-c-v1.jpg" width="200">
+        <br><img src="https://static.fully.com/image/upload/c_limit,dpr_2.0,f_auto,h_700,q_auto,w_700/v1/media/catalog/product/f/u/fully-jarvis-standing-desk-memory-handset-c-v1.jpg" width="200">
     - The control box is a JCB36N2CA-230, which seems to be made by [Jiecang](https://en.jiecang.com/product/9/). Similar products might work similarly.
     
 2. ESP8266. I used a D1 mini, but it should also work with any other ESPHome-capable microcontroller
