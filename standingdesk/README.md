@@ -1,5 +1,8 @@
 # Standing desk (Fully Jarvis)
 
+There is also a similar project by Phord [here](https://github.com/phord/Jarvis).
+I was not aware of this project when I started, but I highly recommend checking it out!
+
 ## What it does
 
 - Allows you to push any button (except M as of now) on the (programmable memory) handset
@@ -53,8 +56,19 @@ It's not really "necessary" but it's a nice touch if you for example want to get
 
     1. Connect GND and 5V from the desk to the ESPs 5V input and to the high-voltage side of the level shifter (HV & GND).
     2. Connect the 3.3V output from the ESP and GND to the low-voltage side of the level shifter (LV & GND).
-    3. Connect ESP pins D5 - D7 to the low-voltage side of the level shifter (LV1 - LV4).
+    3. Connect ESP pins D5 - D7 and D2 to the low-voltage side of the level shifter (LV1 - LV4).
     4. Connect the high-voltage side of the level shifter (HV1 - HV4) to the desk.
+    
+    In the end, the level shifter should be connected as follows (note that some level shifters have GND and HV/LV swapped):
+    
+    | Connected to RJ45 Desk | Connected toESP |
+    |------------------------|-----------------|
+    | 8                      | D5              |
+    | 7                      | D6              |
+    | GND (3)                | GND             |
+    | 5V (5)                 | 3V3             |
+    | 6                      | D7              |
+    | 2                      | D2              |
     
     Here's a good image from a [tutorial](https://learn.sparkfun.com/tutorials/bi-directional-logic-level-converter-hookup-guide) that shows how to connect the level shifter:
     <br><img src="https://cdn.sparkfun.com/assets/f/d/5/8/4/526842ae757b7f5c108b456b.png" width="250">
