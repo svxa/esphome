@@ -12,3 +12,7 @@ Configuration and PCB for an ESPHome integration for a 2020 Fully Jarvis Standin
 ## Battery-powered electricity meter reader
 Configuration and PCB for a SML-based reading head for smart electricity meters.
 The key feature is that it's battery powered from a 3.7V lithium battery pack for months of battery life.
+
+## Wifi speakers \[not production ready\]
+Wifi speakers based on TAS5827 and ESP32-S3 powered by USB Power Delivery and running squeezelite-esp32.
+**Has known issues!**
