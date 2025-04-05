@@ -36,3 +36,7 @@ The PH connectors support through-hole mounting.
 I am using a 1S4P battery pack with 12000mAh. Depending on the sleep settings, I can get up to around 3 months of battery life if I read the sensor once every 5 minutes.
 For my case, I am using smart (i.e. context dependent) sleep settings that are set by my Home Assistant based on some criteria.
 This will lower the reading frequency at night to once an hour. Reading it out about 5min before every full hour was used to make the Home Assistant energy dashboards capture the correct data.
+
+## Configuration
+- esphome configuration: Uses MQTT, as I read somewhere that this is more energy saving, you might wanna verify this.
+- HA configurations: Two automations and two scripts. They are not copy-paste, make sure you check the variable names in there and add the required helpers.
