@@ -31,48 +31,40 @@ It's not really "necessary" but it's a nice touch if you for example want to get
 
 
 ## Prerequisites
-1. Fully Jarvis Standing Desk. I bought mine in 2020, but it still seems to be exactly the same in 2022. [Link](https://www.fully.com/standing-desks/jarvis-frame-only.html)
+Fully Jarvis Standing Desk. I bought mine in 2020, but it still seems to be exactly the same in 2022. [Link](https://www.fully.com/standing-desks/jarvis-frame-only.html)
     - I have the programmable memory handset, but I think it should also work with the non-programmable one. With a bit of extra work, you could make a script that drives up to a certain height.
         <br><img src="https://static.fully.com/image/upload/c_limit,dpr_2.0,f_auto,h_700,q_auto,w_700/v1/media/catalog/product/f/u/fully-jarvis-standing-desk-memory-handset-c-v1.jpg" width="200">
     - The control box is a JCB36N2CA-230, which seems to be made by [Jiecang](https://en.jiecang.com/product/9/). Similar products might work similarly.
-    
-2. ESP8266. I used a D1 mini, but it should also work with any other ESPHome-capable microcontroller
-3. RJ45 Screw Terminal Adaptor Female. [Link](https://www.amazon.com/Poyiccot-Compatible-Terminal-Connector-Ethernet/dp/B07WKKVZRF)
-4. RJ45 Ethernet Splitter. [Link](https://www.amazon.com/Ethernet-Splitter-Yeworth-Networking-Extension/dp/B09PMXTX2K)
-5. Level shifter. [Link](https://www.sparkfun.com/products/12009)
-5. Spare LAN cable (preferably short)
-6. Some jumper cables / breadboard / the usual stuff.
 
-## Hardware build
+### Hardware: Custom PCB
 
-1. Unplug the control panel of the desk and plug the "RJ45 Ethernet Splitter" in between. Then use the spare LAN cable to connect to the "RJ45 Screw Terminal Adaptor"
-<br><img src="images/01_splitter.jpg" width="50%">
+#### Goal
+The goal of designing a custom PCB was to integrate everything into a small package
+that would replace the splitter cable and instead be plugged in directly into the
+desk and the handset.
 
-2. I highly suggest that you use a multimeter to verify the pinout and make sure yours is the same as mine! You can just hold down the buttons on the control panel to pull down the voltage on the pins, so it should be easy to verify.
-<br><img src="images/02_breakout.jpg" width="50%">
+#### What it does
+It provides a simple way to intercept the communication between the desk and the handset.
+It consists mostly of the same components of the previous breadboard design.
+However, it requires fewer cables (only one very short ethernet cable).
 
-3. Wire up the ESP on the breadboard
-<br><img src="images/03_wiring.jpg" width="50%">
 
-    1. Connect GND and 5V from the desk to the ESPs 5V input and to the high-voltage side of the level shifter (HV & GND).
-    2. Connect the 3.3V output from the ESP and GND to the low-voltage side of the level shifter (LV & GND).
-    3. Connect ESP pins D5 - D7 and D2 to the low-voltage side of the level shifter (LV1 - LV4).
-    4. Connect the high-voltage side of the level shifter (HV1 - HV4) to the desk.
-    
-    In the end, the level shifter should be connected as follows (note that some level shifters have GND and HV/LV swapped):
-    
-    | Connected to RJ45 Desk | Connected toESP |
-    |------------------------|-----------------|
-    | 8                      | D5              |
-    | 7                      | D6              |
-    | GND (3)                | GND             |
-    | 5V (5)                 | 3V3             |
-    | 6                      | D7              |
-    | 2                      | D2              |
-    
-    Here's a good image from a [tutorial](https://learn.sparkfun.com/tutorials/bi-directional-logic-level-converter-hookup-guide) that shows how to connect the level shifter:
-    <br><img src="https://cdn.sparkfun.com/assets/f/d/5/8/4/526842ae757b7f5c108b456b.png" width="250">
-    
+#### Hardware
+Two RJ45 ports are connected directly, and at the same time also controllable by
+level-shifted outputs of an [ESP32-C3 from Nologo](https://www.nologo.tech/product/esp32/esp32c3SuperMini/esp32C3SuperMini.html).
+The level-shifting is done by super cheap level shifters.
+
+While the PCB can be assembled in surface-mount design, it can also be assembled by soldering pin headers to it.
+I added some cuttable connections on the PCB, so if someone needs to rewire something, they should be able to do so.
+
+#### Bill of materials
+- [ESP32-C3 from Nologo](https://de.aliexpress.com/i/1005005960095030.html) 
+- Level shifter: <br><img src="https://cdn.sparkfun.com/assets/f/d/5/8/4/526842ae757b7f5c108b456b.png" width="250">
+- 2x RJ45 female ports (you don't need this specific one):
+    - DigiKey part no. RJHSE-5080-ND
+    - Manufacturer: Amphenol ICC
+    - Manufacturer part no.: RJHSE-5080
+    - Description: CONN MOD JACK 8P8C R/A UNSHLD
 
 ## Software
 
@@ -151,6 +143,44 @@ It could possibly be the offset that one can set on the handset.
 
 I chose to calibrate the height with a sensor filter in ESPHome.
 
+## Basic hardware build \[Old version\]
+1. ESP8266. I used a D1 mini, but it should also work with any other ESPHome-capable microcontroller
+2. RJ45 Screw Terminal Adaptor Female. [Link](https://www.amazon.com/Poyiccot-Compatible-Terminal-Connector-Ethernet/dp/B07WKKVZRF)
+3. RJ45 Ethernet Splitter. [Link](https://www.amazon.com/Ethernet-Splitter-Yeworth-Networking-Extension/dp/B09PMXTX2K)
+4. Level shifter. [Link](https://www.sparkfun.com/products/12009)
+5. Spare LAN cable (preferably short)
+6. Some jumper cables / breadboard / the usual stuff.
+
+### Assembly
+
+1. Unplug the control panel of the desk and plug the "RJ45 Ethernet Splitter" in between. Then use the spare LAN cable to connect to the "RJ45 Screw Terminal Adaptor"
+<br><img src="images/01_splitter.jpg" width="50%">
+
+2. I highly suggest that you use a multimeter to verify the pinout and make sure yours is the same as mine! You can just hold down the buttons on the control panel to pull down the voltage on the pins, so it should be easy to verify.
+<br><img src="images/02_breakout.jpg" width="50%">
+
+3. Wire up the ESP on the breadboard
+<br><img src="images/03_wiring.jpg" width="50%">
+
+    1. Connect GND and 5V from the desk to the ESPs 5V input and to the high-voltage side of the level shifter (HV & GND).
+    2. Connect the 3.3V output from the ESP and GND to the low-voltage side of the level shifter (LV & GND).
+    3. Connect ESP pins D5 - D7 and D2 to the low-voltage side of the level shifter (LV1 - LV4).
+    4. Connect the high-voltage side of the level shifter (HV1 - HV4) to the desk.
+    
+    In the end, the level shifter should be connected as follows (note that some level shifters have GND and HV/LV swapped):
+    
+    | Connected to RJ45 Desk | Connected toESP |
+    |------------------------|-----------------|
+    | 8                      | D5              |
+    | 7                      | D6              |
+    | GND (3)                | GND             |
+    | 5V (5)                 | 3V3             |
+    | 6                      | D7              |
+    | 2                      | D2              |
+    
+    Here's a good image from a [tutorial](https://learn.sparkfun.com/tutorials/bi-directional-logic-level-converter-hookup-guide) that shows how to connect the level shifter:
+    <br><img src="https://cdn.sparkfun.com/assets/f/d/5/8/4/526842ae757b7f5c108b456b.png" width="250">
+    
 
 ## Thanks to
 
