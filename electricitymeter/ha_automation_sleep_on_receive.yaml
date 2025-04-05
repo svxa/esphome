@@ -1,0 +1,15 @@
+alias: "Energy: ESP sleep on MQTT received"
+description: ""
+mode: single
+triggers:
+  - topic: espflatpwr/sensor/espflatpwr_energy/state
+    trigger: mqtt
+conditions: []
+actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - action: script.energy_sleep
+    data: {}

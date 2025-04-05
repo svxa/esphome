@@ -1,0 +1,154 @@
+alias: Dynamic sleep duration power meter
+description: ""
+triggers:
+  - entity_id:
+      - sensor.flat_power
+    trigger: state
+conditions: []
+actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - data_template:
+      entity_id: input_number.flat_power_sleep_duration
+      value: >-
+        {% set offset = 300 %}  {# Offset in seconds before the full hour #} {%
+        set margin = 500 %}  {# Margin in seconds #}
+
+        {% set current_time = now() + timedelta(seconds=offset) %} {% set
+        next_full_hour = current_time.replace(minute=0, second=0, microsecond=0)
+        + timedelta(hours=1) %} {% set seconds_until_next_hour = (next_full_hour
+        - current_time).total_seconds() % 3600 %} 
+
+        {% if seconds_until_next_hour < margin %}
+            {% set next_full_hour = next_full_hour + timedelta(hours=1) %}
+            {% set seconds_until_next_hour = (next_full_hour - current_time).total_seconds() %}
+        {% endif %}
+
+        {{ (seconds_until_next_hour / 1) | round(0, 'floor') }}
+    alias: Set sleep to complete a few seconds before the next full hour
+    enabled: false
+    action: input_number.set_value
+  - metadata: {}
+    data: {}
+    enabled: false
+    action: script.energy_sleep
+  - choose:
+      - conditions:
+          - condition: numeric_state
+            entity_id: sensor.estimated_stove_power
+            above: 100
+        sequence:
+          - metadata: {}
+            data: {}
+            action: script.energy_no_sleep
+          - metadata: {}
+            data:
+              stop_actions: true
+            target:
+              entity_id: automation.dynamic_sleep_duration_power_meter
+            action: automation.turn_off
+        alias: Stove is on
+      - conditions:
+          - condition: and
+            conditions:
+              - alias: Power estimate and truth match
+                condition: template
+                value_template: >-
+                  {{((states('sensor.flat_power')|float(0))-(states('sensor.estimated_total_power')|float(0)))
+                  | abs < 10 }}
+              - condition: numeric_state
+                entity_id: sensor.flat_power
+                above: 50
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: and
+                    conditions:
+                      - condition: sun
+                        before: sunrise
+                        before_offset: "01:00"
+                        after: sunset
+                        after_offset: "01:00"
+                      - condition: or
+                        conditions:
+                          - condition: not
+                            conditions:
+                              - condition: or
+                                conditions:
+                                  - condition: zone
+                                    entity_id: person.SOMEONE
+                                    zone: zone.home
+                                  - condition: zone
+                                    entity_id: person.SOMEONE
+                                    zone: zone.home
+                          - condition: state
+                            entity_id: input_boolean.night_mode
+                            state: "on"
+                sequence:
+                  - data_template:
+                      entity_id: input_number.flat_power_sleep_duration
+                      value: >-
+                        {% set offset = 300 %}  {# Offset in seconds before the
+                        full hour #} {% set margin = 450 %}  {# Margin in
+                        seconds #}
+
+                        {% set current_time = now() + timedelta(seconds=offset)
+                        %} {% set next_full_hour =
+                        current_time.replace(minute=0, second=0, microsecond=0)
+                        + timedelta(hours=1) %} {% set seconds_until_next_hour =
+                        (next_full_hour - current_time).total_seconds() % 3600
+                        %} 
+
+                        {% if seconds_until_next_hour < margin %}
+                            {% set next_full_hour = next_full_hour + timedelta(hours=1) %}
+                            {% set seconds_until_next_hour = (next_full_hour - current_time).total_seconds() %}
+                        {% endif %}
+
+                        {{ (seconds_until_next_hour / 1) | round(0, 'floor') }}
+                    alias: >-
+                      Set sleep to complete a few seconds before the next full
+                      hour
+                    action: input_number.set_value
+                  - metadata: {}
+                    data: {}
+                    action: script.energy_sleep
+                alias: Night long sleep
+              - conditions:
+                  - condition: state
+                    entity_id: binary_sensor.kitchen_occupancy
+                    state: "on"
+                sequence:
+                  - metadata: {}
+                    data:
+                      value: 60
+                    target:
+                      entity_id: input_number.flat_power_sleep_duration
+                    action: input_number.set_value
+                  - metadata: {}
+                    data: {}
+                    action: script.energy_sleep
+            default:
+              - metadata: {}
+                data:
+                  value: 120
+                target:
+                  entity_id: input_number.flat_power_sleep_duration
+                action: input_number.set_value
+              - metadata: {}
+                data: {}
+                action: script.energy_sleep
+    default:
+      - metadata: {}
+        data:
+          value: 120
+        target:
+          entity_id: input_number.flat_power_sleep_duration
+        action: input_number.set_value
+      - metadata: {}
+        data: {}
+        action: script.energy_sleep
+    enabled: true
+mode: single

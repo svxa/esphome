@@ -1,0 +1,28 @@
+alias: "Energy: Sleep"
+sequence:
+  - target:
+      entity_id:
+        - automation.energy_esp_sleep_on_mqtt_received
+        - automation.dynamic_sleep_duration_power_meter
+    data: {}
+    action: automation.turn_on
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - metadata: {}
+    data:
+      topic: espflatpwr/sleepduration
+      payload: "{{states('input_number.flat_power_sleep_duration')}}"
+    action: mqtt.publish
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 250
+  - data:
+      topic: espflatpwr/sleep
+      payload: "ON"
+    action: mqtt.publish
+mode: single

@@ -1,0 +1,15 @@
+alias: "Energy: No sleep"
+sequence:
+  - target:
+      entity_id:
+        - automation.energy_esp_sleep_on_mqtt_received
+        - automation.dynamic_sleep_duration_power_meter
+    data:
+      stop_actions: true
+    action: automation.turn_off
+  - data:
+      topic: espflatpwr/nosleep
+      payload: "ON"
+      retain: true
+    action: mqtt.publish
+mode: single
