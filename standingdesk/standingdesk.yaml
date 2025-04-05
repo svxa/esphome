@@ -1,37 +1,34 @@
 ---
-######################### Standing Desk ################################
+######################### Standing Desk CUSTOM PCB ################################
 substitutions:
   device_name: standingdesk
-  ip_address: 192.168.131.34 # Set use_address below if planning to change static ip
   heightoffsetincm: '0.3'
 
+esp32:
+  board: esp32-c3-devkitm-1
 
 esphome:
   name: ${device_name}
-  platform: ESP8266
-  board: d1_mini
   includes:
     - standingdesk_height.h
 
 wifi:
-  networks:
-    # linksys
-  - ssid: !secret lswifissid
-    password: !secret lswifipass
+  fast_connect: true
+  domain: !secret iotdomain
 
-  manual_ip:
-    static_ip: ${ip_address}
-    gateway: !secret wifigateway
-    subnet: !secret wifisubnet
-    dns1: !secret wifidns
+  networks:
+    - ssid: !secret wifissid
+      password: !secret wifipass
 
 # Enable logging
 logger:
 
 api:
-  password: !secret espapipass
+  encryption:
+    key: YOURKEYHERE
 
 ota:
+  platform: esphome
   password: !secret espotapass
 
 time:
@@ -41,21 +38,21 @@ time:
 
 output:
   - platform: gpio
-    id: pin5
+    id: pin8
     pin:
-      number: D5
-      inverted: true
-
-  - platform: gpio
-    id: pin6
-    pin:
-      number: D6
+      number: GPIO2
       inverted: true
 
   - platform: gpio
     id: pin7
     pin:
-      number: D7
+      number: GPIO1
+      inverted: true
+
+  - platform: gpio
+    id: pin6
+    pin:
+      number: GPIO3
       inverted: true
 
 number:
@@ -78,55 +75,55 @@ script:
   mode: single
   then:
     - logger.log: "Moving down"
-    - output.turn_on: pin5
+    - output.turn_on: pin8
     - delay: !lambda "return float(id(target_movement_cm).state) * 275.2;"
-    - output.turn_off: pin5
+    - output.turn_off: pin8
 
 - id: direction_up
   mode: single
   then:
     - logger.log: "Moving up"
-    - output.turn_on: pin6
+    - output.turn_on: pin7
     - delay: !lambda "return float(id(target_movement_cm).state) * 298.5;"
-    - output.turn_off: pin6
+    - output.turn_off: pin7
 
 - id: position_m1
   mode: single
   then:
     - logger.log: "Memory 1: Standing position"
-    - output.turn_on: pin5
-    - output.turn_on: pin6
+    - output.turn_on: pin8
+    - output.turn_on: pin7
     - delay: 500ms
-    - output.turn_off: pin5
-    - output.turn_off: pin6
+    - output.turn_off: pin8
+    - output.turn_off: pin7
 
 - id: position_m2
   mode: single
   then:
     - logger.log: "Memory 2: Sitting position"
-    - output.turn_on: pin7
+    - output.turn_on: pin6
     - delay: 500ms
-    - output.turn_off: pin7
+    - output.turn_off: pin6
 
 - id: position_m3
   mode: single
   then:
     - logger.log: "Memory 3"
-    - output.turn_on: pin5
-    - output.turn_on: pin7
+    - output.turn_on: pin8
+    - output.turn_on: pin6
     - delay: 500ms
-    - output.turn_off: pin5
-    - output.turn_off: pin7
+    - output.turn_off: pin8
+    - output.turn_off: pin6
 
 - id: position_m4
   mode: single
   then:
     - logger.log: "Memory 4"
-    - output.turn_on: pin6
     - output.turn_on: pin7
+    - output.turn_on: pin6
     - delay: 500ms
-    - output.turn_off: pin6
     - output.turn_off: pin7
+    - output.turn_off: pin6
 
 
 button:
@@ -168,40 +165,14 @@ button:
     on_press:
       - script.execute: position_m4
 
-
 uart:
   id: desk_uart
   baud_rate: 9600
   rx_pin:
-    number: D2
+    number: GPIO4
     inverted: false
 
-# binary_sensor:
-#   - platform: gpio
-#     name: ${device_name}_pin5
-#     internal: true
-#     pin:
-#       number: D5
-#       inverted: true
-#   - platform: gpio
-#     name: ${device_name}_pin6
-#     internal: true
-#     pin:
-#       number: D6
-#       inverted: true
-#   - platform: gpio
-#     name: ${device_name}_pin7
-#     internal: true
-#     pin:
-#       number: D7
-#       inverted: true
-
 sensor:
-  - platform: wifi_signal
-    name: ${device_name}_wifi_signal
-    update_interval: 60s
-  - platform: uptime
-    name: ${device_name}_uptime
   - platform: custom
     lambda: |-
       auto desk_height_sensor = new DeskHeightSensor(id(desk_uart));
@@ -216,15 +187,3 @@ sensor:
       filters:
         - offset: ${heightoffsetincm}
     
-text_sensor:
-  - platform: version
-    name: ${device_name}_version
-  - platform: wifi_info
-    ip_address:
-      name: ${device_name}_ip
-    ssid:
-      name: ${device_name}_ssid
-    bssid:
-      name: ${device_name}_bssid
-    mac_address:
-      name: ${device_name}_mac
